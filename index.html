@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT-Orakel</title>
+  <style>
+    @font-face {
+        font-family: 'Share Tech Mono';
+        src: url('ShareTechMono-Regular.ttf');
+    }
+    
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("background.png");
+      background-size: cover;
+      background-position: center;
+      filter: blur(px);
+      transform: scale(1.1);
+      z-index: -1;
+    }
+    
+    .lightning-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #lightning-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .center-image {
+      top: -5vh;
+      position: relative;
+      margin-bottom: -15vh; /* Überlappt nach unten */
+    }
+
+    .center-image img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    
+    .center-image .overlay-text {
+      position: absolute;
+      z-index: 2;
+      top: 53.3%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: min(9vh, 10vw, 4rem);
+      text-align: center;
+      color: #00ffff;
+	    text-shadow: 0 0 8px rgba(0, 255, 255, 0.75), 0 0 16px rgba(0, 0, 0, 0.5), 0 0 32px rgba(0, 0, 0, 0.5), 0 0 64px rgba(0, 0, 0, 0.5);
+    }
+
+    .oracle-box {
+      position: absolute;
+      top: calc(-5vh + 50%);
+      transform: translate(0, calc(5vh + min(32vh, 50vw)));
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.85);
+      color: #00ffff;
+      padding: 0.4em 1.6em;
+      border-radius: 12px;
+      min-width: min(33vh, 60vw);
+      max-width: 80vw;
+      font-size: min(1.5rem, 4.5vh, 5vw);
+      text-align: justify;
+      box-shadow: 0 0 32px 8px rgba(0, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+  <div class="lightning-wrapper">
+    <canvas id="lightning-canvas"></canvas>
+  </div>
+  <div class="content">
+    <div class="center-image">
+      <img src="IT-Orakel.png" alt="IT-Orakel"> <!-- Transparentes PNG hier -->
+	  <div id="MyClockDisplay" class="overlay-text"></div>
+    </div>
+    <div class="oracle-box">
+      <p id="excuse"></p>
+    </div>
+  </div>
+  <script>
+    function showTime(){
+      var date = new Date();
+      var h = date.getHours(); // 0 - 23
+      var m = date.getMinutes(); // 0 - 59
+      var s = date.getSeconds(); // 0 - 59
+      
+      h = (h < 10) ? "0" + h : h;
+      m = (m < 10) ? "0" + m : m;
+      s = (s < 10) ? "0" + s : s;
+      
+      var time = h + ":" + m;
+      document.getElementById("MyClockDisplay").innerText = time;
+      document.getElementById("MyClockDisplay").textContent = time;
+      
+      setTimeout(showTime, 1000);
+      
+    }
+
+    showTime();
+  </script>
+  <script>
+    const canvas = document.getElementById("lightning-canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class LightningStrike {
+      constructor() {
+        this.points = [];
+        this.alpha = 1.0;
+        this.fadeRate = 0.01 + Math.random() * 0.01;
+
+        let x = Math.random() * canvas.width;
+        let y = Math.random() * canvas.height * 0.5;
+        this.points.push({x, y});
+
+        const segments = 20 + Math.floor(Math.random() * 30); // → 20 bis 50 Segmente
+        for (let i = 0; i < segments; i++) {
+          x += (Math.random() - 0.5) * 40;
+          y += Math.random() * 25;
+          this.points.push({x, y});
+        }
+      }
+
+      update() {
+        this.alpha -= this.fadeRate;
+      }
+
+      isAlive() {
+        return this.alpha > 0;
+      }
+
+      draw(ctx) {
+        if (this.points.length < 2) return;
+
+        ctx.strokeStyle = `rgba(196, 255, 255, ${this.alpha})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(this.points[0].x, this.points[0].y);
+
+        for (let i = 1; i < this.points.length; i++) {
+          ctx.lineTo(this.points[i].x, this.points[i].y);
+        }
+
+        ctx.stroke();
+      }
+    }
+
+    let strikes = [];
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Neue Blitze zufällig erzeugen
+      if (Math.random() < 0.01) {
+        strikes.push(new LightningStrike());
+      }
+
+      // Alle aktiven Blitze aktualisieren und zeichnen
+      for (let i = 0; i < strikes.length; i++) {
+        strikes[i].update();
+        strikes[i].draw(ctx);
+      }
+
+      // Entferne abgeblendete Blitze
+      strikes = strikes.filter(strike => strike.isAlive());
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    animate();
+  </script>
+  <script>
+    // Function to fetch content and insert it into a div
+    function fetchAndInsertContent(url, divId) {
+      // Make a GET request to the URL
+      fetch(url)
+        .then(response => {
+          // Check if the request was successful
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text(); // Parse the response as text
+        })
+        .then(data => {
+          // Find the div by ID and insert the fetched content
+          const targetDiv = document.getElementById(divId);
+          if (targetDiv) {
+            targetDiv.innerHTML = data; // Insert the fetched content into the div
+          } else {
+            console.error(`No div with ID "${divId}" found.`);
+          }
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    // Example usage
+    fetchAndInsertContent('https://it-orakel.manuelschneider.net/excuse.php', 'excuse');
+</script>
+</body>
+</html>
