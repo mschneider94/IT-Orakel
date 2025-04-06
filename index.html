@@ -170,7 +170,7 @@
           const targetDiv = document.getElementById(divId);
           if (targetDiv) {
             // Initialize the typed text container
-            targetDiv.innerHTML = '<span id="typed-text"></span>';
+            targetDiv.innerHTML = '<span id="typed-text"><span class="blink_me">█</span></span>';
             const typedText = document.getElementById('typed-text');
             
             let index = 0;
@@ -178,7 +178,11 @@
             // Typing effect
             const typeInterval = setInterval(() => {
               if (index < data.length) {
-                typedText.textContent += data[index];
+                if (index == 0) {
+                  typedText.textContent = data[index];
+                } else {
+                  typedText.textContent += data[index];
+                }
                 index++;
               } else {
                 clearInterval(typeInterval);
