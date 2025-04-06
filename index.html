@@ -100,6 +100,10 @@
       backdrop-filter: blur(5px);
     }
 
+    #excuse {
+      min-height: 1rem;
+    }
+
     #cursor {
       display: inline-block;
       font-weight: bold;
@@ -198,7 +202,7 @@
     }
 
     // Example usage
-    fetchAndInsertContent('excuse.php', 'excuse');
+    setTimeout(() => fetchAndInsertContent('excuse.php', 'excuse'), 2200);
   </script>
   <script>
     const canvas = document.getElementById("lightning-canvas");
