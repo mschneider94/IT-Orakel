@@ -214,7 +214,7 @@
     animate();
   </script>
   <script>
-    // Function to fetch content and insert it into a div
+    // Function to fetch content and insert it into a div with typing effect
     function fetchAndInsertContent(url, divId) {
       // Make a GET request to the URL
       fetch(url)
@@ -226,10 +226,35 @@
           return response.text(); // Parse the response as text
         })
         .then(data => {
-          // Find the div by ID and insert the fetched content
+          // Find the div by ID
           const targetDiv = document.getElementById(divId);
           if (targetDiv) {
-            targetDiv.innerHTML = data; // Insert the fetched content into the div
+            // Add a blinking cursor
+            targetDiv.innerHTML = '<span id="typed-text"></span><span id="cursor">|</span>';
+            const typedText = document.getElementById('typed-text');
+            const cursor = document.getElementById('cursor');
+            
+            let index = 0;
+
+            // Typing effect
+            const typeInterval = setInterval(() => {
+              if (index < data.length) {
+                typedText.textContent += data[index];
+                index++;
+              } else {
+                clearInterval(typeInterval);
+                // Remove the cursor after blinking a few times
+                let blinkCount = 0;
+                const blinkInterval = setInterval(() => {
+                  cursor.style.visibility = cursor.style.visibility === 'hidden' ? 'visible' : 'hidden';
+                  blinkCount++;
+                  if (blinkCount > 5) {
+                    clearInterval(blinkInterval);
+                    cursor.remove();
+                  }
+                }, 300);
+              }
+            }, 100); // Adjust typing speed here (100ms per character)
           } else {
             console.error(`No div with ID "${divId}" found.`);
           }
@@ -240,7 +265,7 @@
     }
 
     // Example usage
-    fetchAndInsertContent('https://it-orakel.manuelschneider.net/excuse.php', 'excuse');
-</script>
+    fetchAndInsertContent('excuse.php', 'excuse');
+  </script>
 </body>
 </html>
