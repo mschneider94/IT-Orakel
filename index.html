@@ -129,7 +129,7 @@
 	  <div id="MyClockDisplay" class="overlay-text"></div>
     </div>
     <div class="oracle-box">
-      <p id="excuse"><span id="typed-text" class="blink_me"></span><span id="cursor">█</span></p>
+      <p id="excuse"><span id="cursor" class="blink_me">█</span></p>
     </div>
   </div>
   <script>
@@ -169,33 +169,19 @@
           // Find the div by ID
           const targetDiv = document.getElementById(divId);
           if (targetDiv) {
-            // Add a blinking block cursor
-            targetDiv.innerHTML = '<span id="typed-text"></span><span id="cursor">█</span>';
+            // Initialize the typed text container
+            targetDiv.innerHTML = '<span id="typed-text"></span>';
             const typedText = document.getElementById('typed-text');
-            const cursor = document.getElementById('cursor');
             
             let index = 0;
 
-            // Initial blinking before typing starts
-            let blinkInterval = setInterval(() => {
-              cursor.style.visibility = cursor.style.visibility === 'hidden' ? 'visible' : 'hidden';
-            }, 500);
-
             // Typing effect
             const typeInterval = setInterval(() => {
-              if (index === 0) {
-                // Stop blinking and make the cursor permanently visible
-                clearInterval(blinkInterval);
-                cursor.style.visibility = 'visible';
-              }
-
               if (index < data.length) {
                 typedText.textContent += data[index];
                 index++;
               } else {
-                // Remove the cursor when the last character is typed
                 clearInterval(typeInterval);
-                cursor.remove();
               }
             }, 100); // Adjust typing speed here (100ms per character)
           } else {
