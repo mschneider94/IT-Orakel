@@ -99,6 +99,13 @@
       box-shadow: 0 0 32px 8px rgba(0, 255, 255, 0.5);
       backdrop-filter: blur(5px);
     }
+
+    #cursor {
+      display: inline-block;
+      font-weight: bold;
+      color: #00ffff;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body>
@@ -135,6 +142,61 @@
     }
 
     showTime();
+  </script>
+  <script>
+    // Function to fetch content and insert it into a div with typing effect
+    function fetchAndInsertContent(url, divId) {
+      // Make a GET request to the URL
+      fetch(url)
+        .then(response => {
+          // Check if the request was successful
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text(); // Parse the response as text
+        })
+        .then(data => {
+          // Find the div by ID
+          const targetDiv = document.getElementById(divId);
+          if (targetDiv) {
+            // Add a blinking block cursor
+            targetDiv.innerHTML = '<span id="typed-text"></span><span id="cursor">█</span>';
+            const typedText = document.getElementById('typed-text');
+            const cursor = document.getElementById('cursor');
+            
+            let index = 0;
+
+            // Initial blinking before typing starts
+            let blinkInterval = setInterval(() => {
+              cursor.style.visibility = cursor.style.visibility === 'hidden' ? 'visible' : 'hidden';
+            }, 500);
+
+            // Typing effect
+            const typeInterval = setInterval(() => {
+              if (index === 0) {
+                // Stop blinking and make the cursor permanently visible
+                clearInterval(blinkInterval);
+                cursor.style.visibility = 'visible';
+              }
+
+              if (index < data.length) {
+                typedText.textContent += data[index];
+                index++;
+              } else {
+                clearInterval(typeInterval);
+              }
+            }, 100); // Adjust typing speed here (100ms per character)
+          } else {
+            console.error(`No div with ID "${divId}" found.`);
+          }
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    // Example usage
+    fetchAndInsertContent('excuse.php', 'excuse');
   </script>
   <script>
     const canvas = document.getElementById("lightning-canvas");
@@ -212,60 +274,6 @@
     });
 
     animate();
-  </script>
-  <script>
-    // Function to fetch content and insert it into a div with typing effect
-    function fetchAndInsertContent(url, divId) {
-      // Make a GET request to the URL
-      fetch(url)
-        .then(response => {
-          // Check if the request was successful
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.text(); // Parse the response as text
-        })
-        .then(data => {
-          // Find the div by ID
-          const targetDiv = document.getElementById(divId);
-          if (targetDiv) {
-            // Add a blinking cursor
-            targetDiv.innerHTML = '<span id="typed-text"></span><span id="cursor">|</span>';
-            const typedText = document.getElementById('typed-text');
-            const cursor = document.getElementById('cursor');
-            
-            let index = 0;
-
-            // Typing effect
-            const typeInterval = setInterval(() => {
-              if (index < data.length) {
-                typedText.textContent += data[index];
-                index++;
-              } else {
-                clearInterval(typeInterval);
-                // Remove the cursor after blinking a few times
-                let blinkCount = 0;
-                const blinkInterval = setInterval(() => {
-                  cursor.style.visibility = cursor.style.visibility === 'hidden' ? 'visible' : 'hidden';
-                  blinkCount++;
-                  if (blinkCount > 5) {
-                    clearInterval(blinkInterval);
-                    cursor.remove();
-                  }
-                }, 300);
-              }
-            }, 100); // Adjust typing speed here (100ms per character)
-          } else {
-            console.error(`No div with ID "${divId}" found.`);
-          }
-        })
-        .catch(error => {
-          console.error('There was a problem with the fetch operation:', error);
-        });
-    }
-
-    // Example usage
-    fetchAndInsertContent('excuse.php', 'excuse');
   </script>
 </body>
 </html>
