@@ -106,6 +106,16 @@
       color: #00ffff;
       font-size: 1em;
     }
+
+    .blink_me {
+      animation: blinker 1s linear infinite;
+    }
+
+    @keyframes blinker {
+      50% {
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -119,7 +129,7 @@
 	  <div id="MyClockDisplay" class="overlay-text"></div>
     </div>
     <div class="oracle-box">
-      <p id="excuse"></p>
+      <p id="excuse"><span id="typed-text" class="blink_me"></span><span id="cursor">█</span></p>
     </div>
   </div>
   <script>
@@ -183,7 +193,9 @@
                 typedText.textContent += data[index];
                 index++;
               } else {
+                // Remove the cursor when the last character is typed
                 clearInterval(typeInterval);
+                cursor.remove();
               }
             }, 100); // Adjust typing speed here (100ms per character)
           } else {
